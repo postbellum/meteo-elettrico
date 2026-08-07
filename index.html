@@ -13,119 +13,133 @@
   body{
     margin:0; background:var(--nero); color:var(--seppia);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+    min-height:100vh; display:flex; align-items:flex-start; justify-content:center; padding:24px;
   }
-  .card{ width:100%; max-width:520px; background:var(--nero2); border:0.5px solid var(--bordo); border-radius:14px; padding:28px; }
-  h1{ font-size:14px; font-weight:500; letter-spacing:1px; text-transform:uppercase; color:var(--seppia-dim); margin:0 0 20px; text-align:center; }
-  .icona{ font-size:60px; text-align:center; margin-bottom:6px; }
+  .card{ width:100%; max-width:540px; background:var(--nero2); border:0.5px solid var(--bordo); border-radius:14px; padding:28px; }
+  h1{ font-size:13px; font-weight:500; letter-spacing:1.5px; text-transform:uppercase; color:var(--seppia-dim); margin:0 0 22px; text-align:center; }
+  .icona{ font-size:56px; text-align:center; margin-bottom:4px; line-height:1; }
   .dominante{ text-align:center; font-size:19px; margin-bottom:6px; }
   .badge{ display:inline-block; padding:3px 10px; border-radius:14px; font-size:11px; margin-left:8px; vertical-align:middle; }
   .badge.verde{background:rgba(92,122,79,0.25);color:#9dc189;}
   .badge.giallo{background:rgba(184,146,58,0.25);color:#e0b862;}
   .badge.rosso{background:rgba(156,58,46,0.25);color:#e08a7a;}
-  .co2{ text-align:center; font-size:12px; color:var(--seppia-dim); margin-bottom:18px; }
+  .co2{ text-align:center; font-size:12px; color:var(--seppia-dim); margin-bottom:20px; }
   .stat-riga{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--bordo); border-radius:8px; overflow:hidden; margin-bottom:18px; }
   .stat-cella{ background:var(--nero2); padding:12px 14px; }
   .stat-label{ font-size:10px; color:var(--seppia-dim); text-transform:uppercase; letter-spacing:0.5px; }
   .stat-valore{ font-size:18px; margin-top:2px; }
+  .stat-nota{ font-size:10px; color:var(--seppia-dim); margin-top:3px; line-height:1.3; }
   .consiglio{ background:rgba(156,58,46,0.12); border:0.5px solid var(--rosso); border-radius:8px; padding:12px 14px; font-size:13px; line-height:1.5; margin-bottom:22px; }
   .consiglio-titolo{ font-size:10px; text-transform:uppercase; letter-spacing:0.5px; color:var(--seppia-dim); margin-bottom:4px; }
+  .sezione-titolo{ font-size:10px; text-transform:uppercase; letter-spacing:0.5px; color:var(--seppia-dim); margin:22px 0 10px; }
   .barra-riga{ display:flex; align-items:center; gap:10px; margin-bottom:9px; font-size:12px; }
-  .barra-label{ width:120px; flex-shrink:0; color:var(--seppia-dim); }
+  .barra-label{ width:118px; flex-shrink:0; color:var(--seppia-dim); }
   .barra-track{ flex:1; height:8px; background:var(--bordo); border-radius:4px; overflow:hidden; }
   .barra-fill{ height:100%; background:var(--rosso); border-radius:4px; }
-  .barra-pct{ width:42px; text-align:right; flex-shrink:0; }
-  .zone-titolo{ font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:var(--seppia-dim); margin:22px 0 10px; }
-  .zone-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
-  .zona{ background:var(--nero2); border:0.5px solid var(--bordo); border-radius:8px; padding:10px 12px; }
+  .barra-pct{ width:44px; text-align:right; flex-shrink:0; }
+  .zone-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .zona{ background:var(--nero); border:0.5px solid var(--bordo); border-radius:8px; padding:10px 12px; }
   .zona-nome{ font-size:11px; color:var(--seppia-dim); }
   .zona-prezzo{ font-size:16px; margin-top:2px; }
-  .footer{ text-align:center; font-size:11px; color:var(--seppia-dim); margin-top:20px; }
-  .stato{ text-align:center; color:var(--seppia-dim); font-size:13px; padding:20px 0; }
+  .avviso{ font-size:11px; color:#e0b862; margin-top:4px; line-height:1.4; }
+  .problemi{ font-size:11px; color:var(--seppia-dim); margin-top:16px; line-height:1.5; border-top:0.5px solid var(--bordo); padding-top:12px; }
+  .footer{ text-align:center; font-size:11px; color:var(--seppia-dim); margin-top:18px; line-height:1.6; }
+  .stato{ text-align:center; color:var(--seppia-dim); font-size:13px; padding:30px 0; }
 </style>
 </head>
 <body>
 
 <div class="card">
   <h1>Meteo elettrico — Italia</h1>
-  <div id="contenuto">
-    <div class="stato">Carico i dati live da ENTSO-E… (7 zone, ci vogliono alcuni secondi)</div>
-  </div>
+  <div id="contenuto"><div class="stato">Carico i dati da ENTSO-E…</div></div>
 </div>
 
 <script>
 const ICONE = {
-  'Solare': '☀️', 'Eolico onshore': '💨', 'Eolico offshore': '💨',
-  'Idro (fluente)': '🌊', 'Idro (bacino)': '🌊', 'Idro (pompaggio)': '🌊',
-  'Nucleare': '⚛️', 'Gas': '🔥', 'Carbone': '🔥', 'Lignite': '🔥',
-  'Petrolio': '🔥', 'Torba': '🔥', 'Scisto bituminoso': '🔥',
-  'Biomasse': '🌱', 'Geotermico': '🌋', 'Rifiuti': '🗑️',
-  'Altro rinnovabile': '🌱', 'Altro': '⚡',
+  'Solare':'☀️','Eolico onshore':'💨','Eolico offshore':'💨',
+  'Idro (fluente)':'🌊','Idro (bacino)':'🌊','Idro (pompaggio)':'🌊',
+  'Nucleare':'⚛️','Gas':'🔥','Carbone':'🔥','Lignite':'🔥','Petrolio':'🔥',
+  'Torba':'🔥','Scisto bituminoso':'🔥','Gas da carbone':'🔥',
+  'Biomasse':'🌱','Geotermico':'🌋','Rifiuti':'🗑️','Altro rinnovabile':'🌱','Altro':'⚡'
 };
-function iconaPer(label){ return ICONE[label] || '⚡'; }
+
+function num(n){ return n === null || n === undefined ? '—' : n.toLocaleString('it-IT'); }
 
 async function carica(){
-  const contenuto = document.getElementById('contenuto');
+  const box = document.getElementById('contenuto');
   try{
-    const res = await fetch('/.netlify/functions/mix');
-    const dati = await res.json();
+    const res = await fetch('/.netlify/functions/mix', { cache:'no-store' });
+    const d = await res.json();
 
-    if (dati.error){
-      contenuto.innerHTML = '<div class="stato">Dato non disponibile: ' + dati.error + '</div>';
+    if (d.error){
+      box.innerHTML = '<div class="stato">' + d.error + '</div>';
       return;
     }
 
-    const icona = iconaPer(dati.dominant);
-    const ora = new Date(dati.updated).toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+    const ora = new Date(d.updated).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+    const icona = ICONE[d.dominant] || '⚡';
 
-    let barreHtml = '';
-    (dati.mix || []).slice(0, 8).forEach(function(voce){
-      barreHtml +=
-        '<div class="barra-riga">' +
-          '<div class="barra-label">' + voce.label + '</div>' +
-          '<div class="barra-track"><div class="barra-fill" style="width:' + voce.pct + '%"></div></div>' +
-          '<div class="barra-pct">' + voce.pct + '%</div>' +
+    let barre = '';
+    (d.mix||[]).slice(0,9).forEach(function(v){
+      barre += '<div class="barra-riga">' +
+        '<div class="barra-label">'+v.label+'</div>' +
+        '<div class="barra-track"><div class="barra-fill" style="width:'+v.pct+'%"></div></div>' +
+        '<div class="barra-pct">'+v.pct+'%</div></div>';
+    });
+
+    let zone = '';
+    (d.zonePrices||[]).forEach(function(z){
+      zone += '<div class="zona"><div class="zona-nome">'+z.name+'</div>' +
+              '<div class="zona-prezzo">'+z.price.toFixed(2)+' €/MWh</div></div>';
+    });
+
+    let html = '';
+
+    if (d.dominant){
+      html += '<div class="icona">'+icona+'</div>' +
+        '<div class="dominante">'+d.dominant +
+        (d.indexLabel ? '<span class="badge '+d.indexLabel+'">'+d.indexLabel+'</span>' : '') +
         '</div>';
-    });
+      if (d.co2Intensity !== null){
+        html += '<div class="co2">~'+d.co2Intensity+' gCO₂/kWh ('+d.co2Nota+') · '+num(d.totalGenerationMw)+' MW generati</div>';
+      }
+    }
 
-    let zoneHtml = '';
-    (dati.zonePrices || []).forEach(function(z){
-      zoneHtml += '<div class="zona"><div class="zona-nome">' + z.name + '</div><div class="zona-prezzo">' + z.price + ' €/MWh</div></div>';
-    });
-
-    const domandaTxt = dati.loadMw != null ? dati.loadMw.toLocaleString('it-IT') + ' MW' : '—';
-    const prezzoTxt = dati.priceNow != null ? dati.priceNow + ' €/MWh (media)' : '—';
-
-    contenuto.innerHTML =
-      '<div class="icona">' + icona + '</div>' +
-      '<div class="dominante">' + (dati.dominant || '—') +
-        '<span class="badge ' + dati.indexLabel + '">' + dati.indexLabel + '</span>' +
+    html += '<div class="stat-riga">' +
+      '<div class="stat-cella"><div class="stat-label">Domanda ora</div>' +
+        '<div class="stat-valore">'+(d.loadMw!==null?num(d.loadMw)+' MW':'—')+'</div>' +
+        (d.avvisoDomanda ? '<div class="avviso">'+d.avvisoDomanda+'</div>' : '') +
       '</div>' +
-      '<div class="co2">~' + dati.co2Intensity + ' gCO2/kWh · ' + dati.totalGenerationMw + ' MW generati (nazionale)</div>' +
+      '<div class="stat-cella"><div class="stat-label">Prezzo ora</div>' +
+        '<div class="stat-valore">'+(d.prezzoMedio!==null?d.prezzoMedio.toFixed(2)+' €/MWh':'—')+'</div>' +
+        '<div class="stat-nota">'+d.prezzoMedioNota+'</div>' +
+      '</div></div>';
 
-      '<div class="stat-riga">' +
-        '<div class="stat-cella"><div class="stat-label">Domanda ora</div><div class="stat-valore">' + domandaTxt + '</div></div>' +
-        '<div class="stat-cella"><div class="stat-label">Prezzo medio</div><div class="stat-valore">' + prezzoTxt + '</div></div>' +
-      '</div>' +
+    html += '<div class="consiglio"><div class="consiglio-titolo">Consiglio</div>'+d.consiglio;
+    if (d.prezzoMinGiorno !== null){
+      html += '<div class="stat-nota" style="margin-top:6px;">Range della giornata: '+
+              d.prezzoMinGiorno.toFixed(2)+' – '+d.prezzoMaxGiorno.toFixed(2)+' €/MWh</div>';
+    }
+    html += '</div>';
 
-      '<div class="consiglio">' +
-        '<div class="consiglio-titolo">Consiglio</div>' +
-        dati.consiglio +
-      '</div>' +
+    if (barre) html += '<div class="sezione-titolo">Mix di generazione</div>' + barre;
+    if (zone)  html += '<div class="sezione-titolo">Prezzo per zona</div><div class="zone-grid">'+zone+'</div>';
 
-      barreHtml +
+    if (d.problemi && d.problemi.length){
+      html += '<div class="problemi"><strong>Dati non disponibili:</strong><br>'+d.problemi.join('<br>')+'</div>';
+    }
 
-      '<div class="zone-titolo">Prezzo per zona</div>' +
-      '<div class="zone-grid">' + zoneHtml + '</div>' +
+    html += '<div class="footer">Aggiornato alle '+ora+' · fonte '+d.fonte+'</div>';
 
-      '<div class="footer">aggiornato alle ' + ora + ' · fonte ENTSO-E · 7 zone</div>';
+    box.innerHTML = html;
 
   }catch(err){
-    contenuto.innerHTML = '<div class="stato">Errore di connessione. Riprova tra poco.</div>';
+    box.innerHTML = '<div class="stato">Errore di connessione. Riprova tra poco.</div>';
   }
 }
 
 carica();
+setInterval(carica, 5*60*1000); // ricarica ogni 5 minuti
 </script>
 
 </body>
