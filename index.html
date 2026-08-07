@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meteo Elettrico — Italia</title>
+<style>
+  :root{
+    --nero:#161310; --nero2:#1f1a14; --seppia:#EDE0C8; --seppia-dim:#8a7c66;
+    --rosso:#9c3a2e; --bordo:#3a3128;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--nero); color:var(--seppia);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .card{ width:100%; max-width:520px; background:var(--nero2); border:0.5px solid var(--bordo); border-radius:14px; padding:28px; }
+  h1{ font-size:14px; font-weight:500; letter-spacing:1px; text-transform:uppercase; color:var(--seppia-dim); margin:0 0 20px; text-align:center; }
+  .icona{ font-size:60px; text-align:center; margin-bottom:6px; }
+  .dominante{ text-align:center; font-size:19px; margin-bottom:6px; }
+  .badge{ display:inline-block; padding:3px 10px; border-radius:14px; font-size:11px; margin-left:8px; vertical-align:middle; }
+  .badge.verde{background:rgba(92,122,79,0.25);color:#9dc189;}
+  .badge.giallo{background:rgba(184,146,58,0.25);color:#e0b862;}
+  .badge.rosso{background:rgba(156,58,46,0.25);color:#e08a7a;}
+  .co2{ text-align:center; font-size:12px; color:var(--seppia-dim); margin-bottom:18px; }
+  .stat-riga{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--bordo); border-radius:8px; overflow:hidden; margin-bottom:18px; }
+  .stat-cella{ background:var(--nero2); padding:12px 14px; }
+  .stat-label{ font-size:10px; color:var(--seppia-dim); text-transform:uppercase; letter-spacing:0.5px; }
+  .stat-valore{ font-size:18px; margin-top:2px; }
+  .consiglio{ background:rgba(156,58,46,0.12); border:0.5px solid var(--rosso); border-radius:8px; padding:12px 14px; font-size:13px; line-height:1.5; margin-bottom:22px; }
+  .consiglio-titolo{ font-size:10px; text-transform:uppercase; letter-spacing:0.5px; color:var(--seppia-dim); margin-bottom:4px; }
+  .barra-riga{ display:flex; align-items:center; gap:10px; margin-bottom:9px; font-size:12px; }
+  .barra-label{ width:120px; flex-shrink:0; color:var(--seppia-dim); }
+  .barra-track{ flex:1; height:8px; background:var(--bordo); border-radius:4px; overflow:hidden; }
+  .barra-fill{ height:100%; background:var(--rosso); border-radius:4px; }
+  .barra-pct{ width:42px; text-align:right; flex-shrink:0; }
+  .zone-titolo{ font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:var(--seppia-dim); margin:22px 0 10px; }
+  .zone-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
+  .zona{ background:var(--nero2); border:0.5px solid var(--bordo); border-radius:8px; padding:10px 12px; }
+  .zona-nome{ font-size:11px; color:var(--seppia-dim); }
+  .zona-prezzo{ font-size:16px; margin-top:2px; }
+  .footer{ text-align:center; font-size:11px; color:var(--seppia-dim); margin-top:20px; }
+  .stato{ text-align:center; color:var(--seppia-dim); font-size:13px; padding:20px 0; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Meteo elettrico — Italia</h1>
+  <div id="contenuto">
+    <div class="stato">Carico i dati live da ENTSO-E… (7 zone, ci vogliono alcuni secondi)</div>
+  </div>
+</div>
+
+<script>
+const ICONE = {
+  'Solare': '☀️', 'Eolico onshore': '💨', 'Eolico offshore': '💨',
+  'Idro (fluente)': '🌊', 'Idro (bacino)': '🌊', 'Idro (pompaggio)': '🌊',
+  'Nucleare': '⚛️', 'Gas': '🔥', 'Carbone': '🔥', 'Lignite': '🔥',
+  'Petrolio': '🔥', 'Torba': '🔥', 'Scisto bituminoso': '🔥',
+  'Biomasse': '🌱', 'Geotermico': '🌋', 'Rifiuti': '🗑️',
+  'Altro rinnovabile': '🌱', 'Altro': '⚡',
+};
+function iconaPer(label){ return ICONE[label] || '⚡'; }
+
+async function carica(){
+  const contenuto = document.getElementById('contenuto');
+  try{
+    const res = await fetch('/.netlify/functions/mix');
+    const dati = await res.json();
+
+    if (dati.error){
+      contenuto.innerHTML = '<div class="stato">Dato non disponibile: ' + dati.error + '</div>';
+      return;
+    }
+
+    const icona = iconaPer(dati.dominant);
+    const ora = new Date(dati.updated).toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+
+    let barreHtml = '';
+    (dati.mix || []).slice(0, 8).forEach(function(voce){
+      barreHtml +=
+        '<div class="barra-riga">' +
+          '<div class="barra-label">' + voce.label + '</div>' +
+          '<div class="barra-track"><div class="barra-fill" style="width:' + voce.pct + '%"></div></div>' +
+          '<div class="barra-pct">' + voce.pct + '%</div>' +
+        '</div>';
+    });
+
+    let zoneHtml = '';
+    (dati.zonePrices || []).forEach(function(z){
+      zoneHtml += '<div class="zona"><div class="zona-nome">' + z.name + '</div><div class="zona-prezzo">' + z.price + ' €/MWh</div></div>';
+    });
+
+    const domandaTxt = dati.loadMw != null ? dati.loadMw.toLocaleString('it-IT') + ' MW' : '—';
+    const prezzoTxt = dati.priceNow != null ? dati.priceNow + ' €/MWh (media)' : '—';
+
+    contenuto.innerHTML =
+      '<div class="icona">' + icona + '</div>' +
+      '<div class="dominante">' + (dati.dominant || '—') +
+        '<span class="badge ' + dati.indexLabel + '">' + dati.indexLabel + '</span>' +
+      '</div>' +
+      '<div class="co2">~' + dati.co2Intensity + ' gCO2/kWh · ' + dati.totalGenerationMw + ' MW generati (nazionale)</div>' +
+
+      '<div class="stat-riga">' +
+        '<div class="stat-cella"><div class="stat-label">Domanda ora</div><div class="stat-valore">' + domandaTxt + '</div></div>' +
+        '<div class="stat-cella"><div class="stat-label">Prezzo medio</div><div class="stat-valore">' + prezzoTxt + '</div></div>' +
+      '</div>' +
+
+      '<div class="consiglio">' +
+        '<div class="consiglio-titolo">Consiglio</div>' +
+        dati.consiglio +
+      '</div>' +
+
+      barreHtml +
+
+      '<div class="zone-titolo">Prezzo per zona</div>' +
+      '<div class="zone-grid">' + zoneHtml + '</div>' +
+
+      '<div class="footer">aggiornato alle ' + ora + ' · fonte ENTSO-E · 7 zone</div>';
+
+  }catch(err){
+    contenuto.innerHTML = '<div class="stato">Errore di connessione. Riprova tra poco.</div>';
+  }
+}
+
+carica();
+</script>
+
+</body>
+</html>
