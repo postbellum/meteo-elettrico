@@ -1,9 +1,6 @@
 {
-  "name": "meteo-elettrico",
+  "name": "mix-elettrico-italia",
   "version": "1.0.0",
   "private": true,
-  "description": "Bollettino live del mix elettrico italiano, in stile meteo",
-  "dependencies": {
-    "fast-xml-parser": "^4.3.0"
-  }
+  "dependencies": { "fast-xml-parser": "^4.3.0" }
 }
